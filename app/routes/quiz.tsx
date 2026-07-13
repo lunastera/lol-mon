@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router";
 import { ChoiceButton } from "~/components/ChoiceButton";
 import { ProgressBar } from "~/components/ProgressBar";
@@ -34,6 +34,16 @@ export default function Quiz({ loaderData: data }: Route.ComponentProps) {
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
+
+  // Warm the browser cache for every image in the set so later questions
+  // render without a visible load.
+  useEffect(() => {
+    for (const q of questions) {
+      for (const url of [q.imageUrl, ...(q.choiceImageUrls ?? [])]) {
+        if (url) new Image().src = url;
+      }
+    }
+  }, [questions]);
 
   if (questions.length === 0) {
     return (
@@ -94,6 +104,7 @@ export default function Quiz({ loaderData: data }: Route.ComponentProps) {
           <ChoiceButton
             key={choice}
             label={choice}
+            iconUrl={question.choiceImageUrls?.[i]}
             revealed={revealed}
             isAnswer={i === question.answerIndex}
             isSelected={i === selected}

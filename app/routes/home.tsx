@@ -5,7 +5,14 @@ import {
   loadQuizData,
   POSITIONS,
   type Position,
+  type QuizData,
 } from "~/lib/data";
+import {
+  canPredownload,
+  isPredownloaded,
+  predownloadImages,
+} from "~/lib/imageCache";
+import { allImageUrls } from "~/lib/images";
 import {
   championPool,
   DEFAULT_SELECTION,
@@ -53,6 +60,69 @@ function CheckOption({
       />
       {label}
     </label>
+  );
+}
+
+function ImagePredownload({ data }: { data: QuizData }) {
+  const [status, setStatus] = useState<"idle" | "running" | "done" | "error">(
+    () => (isPredownloaded(data.version) ? "done" : "idle"),
+  );
+  const [progress, setProgress] = useState(0);
+  const urls = useMemo(() => allImageUrls(data), [data]);
+
+  if (!canPredownload()) return null;
+
+  const run = async () => {
+    setStatus("running");
+    setProgress(0);
+    try {
+      await predownloadImages(urls, data.version, (done) => setProgress(done));
+      setStatus("done");
+    } catch {
+      setStatus("error");
+    }
+  };
+
+  return (
+    <section className="mt-6 rounded-xl border border-gold-dark/40 bg-hextech-black/40 p-4 text-sm">
+      {status === "done" ? (
+        <p className="text-gold-light/70">
+          ✓ 画像を端末に保存済みです（v{data.version}
+          ）。問題の表示が高速になります。
+        </p>
+      ) : status === "running" ? (
+        <div>
+          <p className="mb-2 text-gold-light/70">
+            画像をダウンロード中… {progress} / {urls.length}
+          </p>
+          <div className="h-1.5 overflow-hidden rounded-full bg-deep-blue">
+            <div
+              className="h-full rounded-full bg-gold transition-all"
+              style={{ width: `${(progress / urls.length) * 100}%` }}
+            />
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-gold-light/60">
+            問題画像・アイコン（{urls.length} 枚・約 7MB）を端末に保存して
+            表示を高速化できます
+            {status === "error" && (
+              <span className="block text-red-400">
+                ダウンロードに失敗しました。再度お試しください。
+              </span>
+            )}
+          </p>
+          <button
+            type="button"
+            onClick={run}
+            className="rounded-lg border border-gold-dark px-3 py-1.5 text-gold transition-colors hover:border-gold cursor-pointer"
+          >
+            事前ダウンロード
+          </button>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -181,6 +251,8 @@ export default function Home({ loaderData: data }: Route.ComponentProps) {
       {blocker && (
         <p className="mt-2 text-center text-xs text-red-400">{blocker}</p>
       )}
+
+      <ImagePredownload data={data} />
 
       <footer className="mt-auto pt-12 text-center text-xs leading-relaxed text-gold-light/40">
         <p>

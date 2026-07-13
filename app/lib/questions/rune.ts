@@ -1,3 +1,4 @@
+import { summonerSpellImageUrl } from "../data";
 import { pick } from "../random";
 import { buildChoices, type QuestionGenerator } from "./index";
 
@@ -56,6 +57,10 @@ export const summonerByDescription: QuestionGenerator = ({ data, rng }) => {
   return {
     text: `「${spell.description}」— このサモナースペルは？`,
     ...built,
+    choiceImageUrls: built.choices.map((name) => {
+      const s = data.summonerSpells.find((sp) => sp.name === name);
+      return s ? summonerSpellImageUrl(data, s) : undefined;
+    }),
     category: "rune",
   };
 };

@@ -67,7 +67,11 @@ export interface QuizData {
   summonerSpells: SummonerSpell[];
 }
 
-const DDRAGON_CDN = "https://ddragon.leagueoflegends.com/cdn";
+// Images stay on the Data Dragon CDN (self-hosting them is not clearly
+// permitted by Riot's policies). public/sw.js caches them on the user's
+// device: once displayed — or pre-downloaded from the home screen — they
+// are served from local Cache Storage.
+export const DDRAGON_CDN = "https://ddragon.leagueoflegends.com/cdn";
 
 export function championImageUrl(data: QuizData, champion: Champion): string {
   return `${DDRAGON_CDN}/${data.version}/img/champion/${champion.id}.png`;
@@ -75,6 +79,13 @@ export function championImageUrl(data: QuizData, champion: Champion): string {
 
 export function itemImageUrl(data: QuizData, item: Item): string {
   return `${DDRAGON_CDN}/${data.version}/img/item/${item.id}.png`;
+}
+
+export function summonerSpellImageUrl(
+  data: QuizData,
+  spell: SummonerSpell,
+): string {
+  return `${DDRAGON_CDN}/${data.version}/img/spell/${spell.id}.png`;
 }
 
 let cache: Promise<QuizData> | undefined;

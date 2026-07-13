@@ -1,9 +1,21 @@
-import { championImageUrl } from "../data";
+import { type Champion, championImageUrl, type QuizData } from "../data";
 import { pick } from "../random";
 import { buildChoices, type QuestionGenerator } from "./index";
 
+/** Champion icons for choices that are champion names. */
+function championIcons(
+  data: QuizData,
+  choices: string[],
+  pool: readonly Champion[],
+): (string | undefined)[] {
+  return choices.map((name) => {
+    const champion = pool.find((c) => c.name === name);
+    return champion ? championImageUrl(data, champion) : undefined;
+  });
+}
+
 /** スキル名からチャンピオンを当てる */
-export const skillOwner: QuestionGenerator = ({ champions, rng }) => {
+export const skillOwner: QuestionGenerator = ({ data, champions, rng }) => {
   const candidates = champions.filter((c) => c.spells.length > 0);
   if (candidates.length === 0) return undefined;
   const champion = pick(rng, candidates);
@@ -17,6 +29,7 @@ export const skillOwner: QuestionGenerator = ({ champions, rng }) => {
   return {
     text: `スキル「${skill}」を持つチャンピオンは？`,
     ...built,
+    choiceImageUrls: championIcons(data, built.choices, champions),
     category: "champion",
   };
 };
@@ -35,7 +48,7 @@ export const championTitle: QuestionGenerator = ({ champions, rng }) => {
 };
 
 /** 称号からチャンピオンを当てる */
-export const titleOwner: QuestionGenerator = ({ champions, rng }) => {
+export const titleOwner: QuestionGenerator = ({ data, champions, rng }) => {
   const champion = pick(rng, champions);
   const distractors = champions
     .filter((c) => c.title !== champion.title)
@@ -45,6 +58,7 @@ export const titleOwner: QuestionGenerator = ({ champions, rng }) => {
   return {
     text: `「${champion.title}」という称号を持つチャンピオンは？`,
     ...built,
+    choiceImageUrls: championIcons(data, built.choices, champions),
     category: "champion",
   };
 };

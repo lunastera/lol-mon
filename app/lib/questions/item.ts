@@ -1,6 +1,18 @@
-import { itemImageUrl } from "../data";
+import { type Item, itemImageUrl, type QuizData } from "../data";
 import { pick } from "../random";
 import { buildChoices, type QuestionGenerator } from "./index";
+
+/** Item icons for choices that are item names. */
+function itemIcons(
+  data: QuizData,
+  choices: string[],
+  items: readonly Item[],
+): (string | undefined)[] {
+  return choices.map((name) => {
+    const item = items.find((i) => i.name === name);
+    return item ? itemImageUrl(data, item) : undefined;
+  });
+}
 
 /** 価格問題やアイコン問題の対象にする最低価格（初級コンポーネントを除外） */
 const MIN_PRICE = 900;
@@ -51,6 +63,7 @@ export const itemEffect: QuestionGenerator = ({ data, rng }) => {
   return {
     text: `「${item.plaintext}」— この効果を持つアイテムは？`,
     ...built,
+    choiceImageUrls: itemIcons(data, built.choices, data.items),
     category: "item",
   };
 };

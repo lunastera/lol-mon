@@ -27,6 +27,8 @@ const PLAY_RATE_THRESHOLD = 0.5;
 /** Summoner's Rift map id in Data Dragon item data. */
 const MAP_SR = "11";
 
+const publicDir = join(dirname(fileURLToPath(import.meta.url)), "..", "public");
+
 async function fetchJson<T>(url: string): Promise<T> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}: ${url}`);
@@ -192,13 +194,7 @@ async function main() {
     summonerSpells,
   };
 
-  const outPath = join(
-    dirname(fileURLToPath(import.meta.url)),
-    "..",
-    "public",
-    "data",
-    "quiz-data.json",
-  );
+  const outPath = join(publicDir, "data", "quiz-data.json");
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, JSON.stringify(data, null, 1));
   console.log(

@@ -17,6 +17,11 @@ export interface Question {
   imageUrl?: string;
   choices: string[];
   answerIndex: number;
+  /**
+   * Icon for each choice, aligned with `choices`. Omitted for questions
+   * where an icon would give the answer away (e.g. "この画像は？").
+   */
+  choiceImageUrls?: (string | undefined)[];
   category: Category;
 }
 
