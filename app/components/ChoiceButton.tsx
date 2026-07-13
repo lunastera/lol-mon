@@ -1,6 +1,8 @@
 interface ChoiceButtonProps {
   label: string;
   iconUrl?: string;
+  /** hover tooltip (e.g. skill effect description) */
+  tooltip?: string;
   revealed: boolean;
   isAnswer: boolean;
   isSelected: boolean;
@@ -10,6 +12,7 @@ interface ChoiceButtonProps {
 export function ChoiceButton({
   label,
   iconUrl,
+  tooltip,
   revealed,
   isAnswer,
   isSelected,
@@ -31,8 +34,13 @@ export function ChoiceButton({
       type="button"
       disabled={revealed}
       onClick={onClick}
-      className={`w-full rounded-lg border px-4 py-2.5 text-left transition-colors ${style}`}
+      className={`group relative w-full rounded-lg border px-4 py-2.5 text-left transition-colors ${style}`}
     >
+      {tooltip && (
+        <span className="pointer-events-none absolute bottom-full left-2 z-10 mb-1.5 hidden max-w-[calc(100%-1rem)] rounded-lg border border-gold-dark bg-hextech-black p-2.5 text-xs font-normal leading-relaxed text-gold-light/90 shadow-lg group-hover:block">
+          {tooltip}
+        </span>
+      )}
       <span className="flex items-center gap-3">
         {iconUrl && (
           <img

@@ -20,6 +20,26 @@ export const LANE_LABELS: Record<Position, string> = {
   UTILITY: "SUP",
 };
 
+export const SPELL_SLOTS = ["Q", "W", "E", "R"] as const;
+
+export type SpellSlot = (typeof SPELL_SLOTS)[number];
+
+export interface ChampionSpell {
+  slot: SpellSlot;
+  name: string;
+  /** plain-text effect description */
+  description: string;
+  /** image filename under cdn img/spell/ */
+  image: string;
+}
+
+export interface ChampionPassive {
+  name: string;
+  description: string;
+  /** image filename under cdn img/passive/ */
+  image: string;
+}
+
 export interface Champion {
   /** Data Dragon id (e.g. "Aatrox") — also the image filename stem */
   id: string;
@@ -29,9 +49,9 @@ export interface Champion {
   title: string;
   tags: string[];
   positions: Position[];
-  /** Q/W/E/R skill names */
-  spells: string[];
-  passive: string;
+  /** Q/W/E/R skills */
+  spells: ChampionSpell[];
+  passive: ChampionPassive;
 }
 
 export interface Item {
@@ -86,6 +106,20 @@ export function summonerSpellImageUrl(
   spell: SummonerSpell,
 ): string {
   return `${DDRAGON_CDN}/${data.version}/img/spell/${spell.id}.png`;
+}
+
+export function championSpellImageUrl(
+  data: QuizData,
+  spell: ChampionSpell,
+): string {
+  return `${DDRAGON_CDN}/${data.version}/img/spell/${spell.image}`;
+}
+
+export function championPassiveImageUrl(
+  data: QuizData,
+  passive: ChampionPassive,
+): string {
+  return `${DDRAGON_CDN}/${data.version}/img/passive/${passive.image}`;
 }
 
 let cache: Promise<QuizData> | undefined;

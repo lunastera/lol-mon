@@ -1,5 +1,7 @@
 import {
   championImageUrl,
+  championPassiveImageUrl,
+  championSpellImageUrl,
   itemImageUrl,
   type QuizData,
   summonerSpellImageUrl,
@@ -8,7 +10,11 @@ import {
 /** Every image the quiz can show, for pre-downloading. */
 export function allImageUrls(data: QuizData): string[] {
   return [
-    ...data.champions.map((c) => championImageUrl(data, c)),
+    ...data.champions.flatMap((c) => [
+      championImageUrl(data, c),
+      championPassiveImageUrl(data, c.passive),
+      ...c.spells.map((s) => championSpellImageUrl(data, s)),
+    ]),
     ...data.items.map((i) => itemImageUrl(data, i)),
     ...data.summonerSpells.map((s) => summonerSpellImageUrl(data, s)),
   ];

@@ -64,11 +64,11 @@ function CheckOption({
 }
 
 function ImagePredownload({ data }: { data: QuizData }) {
+  const urls = useMemo(() => allImageUrls(data), [data]);
   const [status, setStatus] = useState<"idle" | "running" | "done" | "error">(
-    () => (isPredownloaded(data.version) ? "done" : "idle"),
+    () => (isPredownloaded(data.version, urls.length) ? "done" : "idle"),
   );
   const [progress, setProgress] = useState(0);
-  const urls = useMemo(() => allImageUrls(data), [data]);
 
   if (!canPredownload()) return null;
 
@@ -105,7 +105,7 @@ function ImagePredownload({ data }: { data: QuizData }) {
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-2">
           <p className="text-gold-light/60">
-            問題画像・アイコン（{urls.length} 枚・約 7MB）を端末に保存して
+            問題画像・アイコン（{urls.length} 枚・約 15MB）を端末に保存して
             表示を高速化できます
             {status === "error" && (
               <span className="block text-red-400">

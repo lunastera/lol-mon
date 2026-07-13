@@ -6,16 +6,23 @@ import { allImageUrls } from "./images";
 const data = quizDataJson as unknown as QuizData;
 
 describe("allImageUrls", () => {
-  it("covers every champion, item, and summoner spell exactly once", () => {
+  it("covers every champion, skill, passive, item, and summoner spell exactly once", () => {
     const urls = allImageUrls(data);
+    const spellCount = data.champions.reduce(
+      (sum, c) => sum + c.spells.length,
+      0,
+    );
     expect(urls).toHaveLength(
-      data.champions.length + data.items.length + data.summonerSpells.length,
+      data.champions.length * 2 + // icon + passive
+        spellCount +
+        data.items.length +
+        data.summonerSpells.length,
     );
     expect(new Set(urls).size).toBe(urls.length);
     for (const url of urls) {
       expect(url).toMatch(
         new RegExp(
-          `^https://ddragon\\.leagueoflegends\\.com/cdn/${data.version}/img/(champion|item|spell)/.+\\.png$`,
+          `^https://ddragon\\.leagueoflegends\\.com/cdn/${data.version}/img/(champion|item|spell|passive)/.+\\.png$`,
         ),
       );
     }

@@ -67,6 +67,41 @@ describe("buildQuizSet", () => {
     });
   }
 
+  it("skill questions: slot answers match the kit and descriptions mask the champion", () => {
+    const questions = buildQuizSet(
+      data,
+      { lanes: [...DEFAULT_SELECTION.lanes], types: ["skill"] },
+      createRng(3),
+      40,
+    );
+    expect(questions).toHaveLength(40);
+    const byName = new Map(data.champions.map((c) => [c.name, c]));
+    let slotSeen = 0;
+    let ownerSeen = 0;
+    for (const q of questions) {
+      const slotMatch = q.text.match(/^(.+) の ([QWER]) スキルは？$/);
+      if (slotMatch) {
+        slotSeen++;
+        const champion = byName.get(slotMatch[1]);
+        expect(champion, q.text).toBeDefined();
+        const spell = champion?.spells.find((s) => s.slot === slotMatch[2]);
+        expect(q.choices[q.answerIndex]).toBe(spell?.name);
+        // Choices and tooltips all come from the champion's own kit.
+        const kit = champion?.spells.map((s) => s.name) ?? [];
+        for (const choice of q.choices) expect(kit).toContain(choice);
+        expect(q.choiceTooltips?.filter(Boolean)).toHaveLength(4);
+      } else {
+        ownerSeen++;
+        expect(q.detail, q.text).toBeTruthy();
+        expect(q.imageUrl, q.text).toBeTruthy();
+        // The masked description must not name the answer champion.
+        expect(q.detail).not.toContain(q.choices[q.answerIndex]);
+      }
+    }
+    expect(slotSeen).toBeGreaterThan(0);
+    expect(ownerSeen).toBeGreaterThan(0);
+  });
+
   it("only produces questions of the selected types", () => {
     const questions = buildQuizSet(
       data,

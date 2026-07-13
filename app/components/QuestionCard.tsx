@@ -22,6 +22,11 @@ export function QuestionCard({ question }: { question: Question }) {
         />
       )}
       <p className="text-lg font-bold leading-relaxed">{question.text}</p>
+      {question.detail && (
+        <p className="mt-3 rounded-lg bg-deep-blue/40 p-3 text-sm leading-relaxed text-gold-light/75">
+          {question.detail}
+        </p>
+      )}
     </div>
   );
 }

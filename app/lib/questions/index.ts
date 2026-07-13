@@ -5,6 +5,7 @@ import {
   championImage,
   championTitle,
   skillOwner,
+  skillSlot,
   titleOwner,
 } from "./champion";
 import { itemEffect, itemImage, itemPrice } from "./item";
@@ -14,6 +15,8 @@ export type Category = "champion" | "item" | "rune";
 
 export interface Question {
   text: string;
+  /** supplementary text shown under the question (e.g. skill description) */
+  detail?: string;
   imageUrl?: string;
   choices: string[];
   answerIndex: number;
@@ -22,6 +25,8 @@ export interface Question {
    * where an icon would give the answer away (e.g. "この画像は？").
    */
   choiceImageUrls?: (string | undefined)[];
+  /** hover tooltip for each choice, aligned with `choices` */
+  choiceTooltips?: (string | undefined)[];
   category: Category;
 }
 
@@ -48,7 +53,7 @@ export const QUESTION_TYPES = [
     id: "skill",
     label: "スキル",
     category: "champion",
-    generators: [skillOwner],
+    generators: [skillOwner, skillSlot],
   },
   {
     id: "title",

@@ -11,10 +11,13 @@ export function canPredownload(): boolean {
   return typeof window !== "undefined" && "caches" in window;
 }
 
-/** Whether a pre-download has completed for this Data Dragon version. */
-export function isPredownloaded(version: string): boolean {
+/**
+ * Whether a pre-download has completed for this Data Dragon version and
+ * image set. The count invalidates the flag when new image kinds are added.
+ */
+export function isPredownloaded(version: string, count: number): boolean {
   try {
-    return localStorage.getItem(FLAG_KEY) === version;
+    return localStorage.getItem(FLAG_KEY) === `${version}:${count}`;
   } catch {
     return false;
   }
@@ -53,7 +56,7 @@ export async function predownloadImages(
   );
 
   try {
-    localStorage.setItem(FLAG_KEY, version);
+    localStorage.setItem(FLAG_KEY, `${version}:${urls.length}`);
   } catch {
     // Cache Storage succeeded; the flag is only a UI hint.
   }

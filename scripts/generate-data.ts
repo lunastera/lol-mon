@@ -15,7 +15,7 @@ import type {
   RuneStyle,
   SummonerSpell,
 } from "../app/lib/data";
-import { POSITIONS } from "../app/lib/data";
+import { POSITIONS, SPELL_SLOTS } from "../app/lib/data";
 
 const DDRAGON = "https://ddragon.leagueoflegends.com";
 const MERAKI_RATES =
@@ -44,10 +44,27 @@ interface DDragonChampionFull {
       name: string;
       title: string;
       tags: string[];
-      spells: { name: string }[];
-      passive: { name: string };
+      spells: {
+        name: string;
+        description: string;
+        image: { full: string };
+      }[];
+      passive: {
+        name: string;
+        description: string;
+        image: { full: string };
+      };
     }
   >;
+}
+
+/** Data Dragon descriptions contain HTML tags (<br>, <font> etc.). */
+function stripHtml(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, " ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 interface DDragonItems {
@@ -122,6 +139,17 @@ async function main() {
       fetchJson<MerakiRates>(MERAKI_RATES),
     ]);
 
+  // Data Dragon normalizes every champion to exactly 4 spells; multi-skill
+  // kits (Hwei's subjects, Aphelios' weapon system, form swappers like Jayce)
+  // are already folded into Q/W/E/R entries. Warn if a patch breaks this.
+  for (const c of Object.values(championFull.data)) {
+    if (c.spells.length !== 4) {
+      console.warn(
+        `${c.id} has ${c.spells.length} spells; only the first 4 get Q/W/E/R slots`,
+      );
+    }
+  }
+
   const champions: Champion[] = Object.values(championFull.data)
     .map((c) => ({
       id: c.id,
@@ -130,8 +158,17 @@ async function main() {
       title: c.title,
       tags: c.tags,
       positions: assignPositions(merakiRates.data[c.key]),
-      spells: c.spells.map((s) => s.name),
-      passive: c.passive.name,
+      spells: c.spells.slice(0, 4).map((s, i) => ({
+        slot: SPELL_SLOTS[i],
+        name: s.name,
+        description: stripHtml(s.description),
+        image: s.image.full,
+      })),
+      passive: {
+        name: c.passive.name,
+        description: stripHtml(c.passive.description),
+        image: c.passive.image.full,
+      },
     }))
     .sort((a, b) => a.id.localeCompare(b.id));
 

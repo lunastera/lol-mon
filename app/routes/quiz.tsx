@@ -105,6 +105,7 @@ export default function Quiz({ loaderData: data }: Route.ComponentProps) {
             key={choice}
             label={choice}
             iconUrl={question.choiceImageUrls?.[i]}
+            tooltip={question.choiceTooltips?.[i]}
             revealed={revealed}
             isAnswer={i === question.answerIndex}
             isSelected={i === selected}
