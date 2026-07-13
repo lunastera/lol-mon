@@ -1,4 +1,4 @@
-import { summonerSpellImageUrl } from "../data";
+import { runeImageUrl, summonerSpellImageUrl } from "../data";
 import { pick } from "../random";
 import { buildChoices, type QuestionGenerator } from "./index";
 
@@ -15,8 +15,13 @@ export const runeStyleOf: QuestionGenerator = ({ data, rng }) => {
   const built = buildChoices(rng, style.name, distractors);
   if (!built) return undefined;
   return {
-    text: `ルーン「${rune}」が属する系統は？`,
+    text: `ルーン「${rune.name}」が属する系統は？`,
+    imageUrl: runeImageUrl(rune.icon),
     ...built,
+    choiceImageUrls: built.choices.map((name) => {
+      const s = data.runeStyles.find((st) => st.name === name);
+      return s ? runeImageUrl(s.icon) : undefined;
+    }),
     category: "rune",
   };
 };

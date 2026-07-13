@@ -4,6 +4,7 @@ import {
   championSpellImageUrl,
   itemImageUrl,
   type QuizData,
+  runeImageUrl,
   summonerSpellImageUrl,
 } from "./data";
 
@@ -16,6 +17,10 @@ export function allImageUrls(data: QuizData): string[] {
       ...c.spells.map((s) => championSpellImageUrl(data, s)),
     ]),
     ...data.items.map((i) => itemImageUrl(data, i)),
+    ...data.runeStyles.flatMap((style) => [
+      runeImageUrl(style.icon),
+      ...style.runes.map((r) => runeImageUrl(r.icon)),
+    ]),
     ...data.summonerSpells.map((s) => summonerSpellImageUrl(data, s)),
   ];
 }

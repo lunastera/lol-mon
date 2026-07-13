@@ -65,10 +65,18 @@ export interface Item {
   tags: string[];
 }
 
+export interface Rune {
+  name: string;
+  /** icon path under cdn img/ (e.g. "perk-images/Styles/...") */
+  icon: string;
+}
+
 export interface RuneStyle {
   /** e.g. "覇道", "栄華" */
   name: string;
-  runes: string[];
+  /** icon path under cdn img/ */
+  icon: string;
+  runes: Rune[];
 }
 
 export interface SummonerSpell {
@@ -120,6 +128,11 @@ export function championPassiveImageUrl(
   passive: ChampionPassive,
 ): string {
   return `${DDRAGON_CDN}/${data.version}/img/passive/${passive.image}`;
+}
+
+/** Rune / rune style icons are unversioned on the CDN. */
+export function runeImageUrl(icon: string): string {
+  return `${DDRAGON_CDN}/img/${icon}`;
 }
 
 let cache: Promise<QuizData> | undefined;

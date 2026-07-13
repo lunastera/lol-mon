@@ -87,7 +87,8 @@ interface DDragonItems {
 interface DDragonRunes
   extends Array<{
     name: string;
-    slots: { runes: { name: string }[] }[];
+    icon: string;
+    slots: { runes: { name: string; icon: string }[] }[];
   }> {}
 
 interface DDragonSummoner {
@@ -209,7 +210,10 @@ async function main() {
 
   const runeStyles: RuneStyle[] = runeData.map((style) => ({
     name: style.name,
-    runes: style.slots.flatMap((slot) => slot.runes.map((r) => r.name)),
+    icon: style.icon,
+    runes: style.slots.flatMap((slot) =>
+      slot.runes.map((r) => ({ name: r.name, icon: r.icon })),
+    ),
   }));
 
   const summonerSpells: SummonerSpell[] = Object.values(summonerData.data)
