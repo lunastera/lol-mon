@@ -2,7 +2,7 @@ import { pick } from "../random";
 import { buildChoices, type QuestionGenerator } from "./index";
 
 /** ルーンが属する系統（覇道・栄華など）を当てる */
-const runeStyleOf: QuestionGenerator = ({ data, rng }) => {
+export const runeStyleOf: QuestionGenerator = ({ data, rng }) => {
   if (data.runeStyles.length < 4) return undefined;
   const style = pick(rng, data.runeStyles);
   if (style.runes.length === 0) return undefined;
@@ -21,7 +21,7 @@ const runeStyleOf: QuestionGenerator = ({ data, rng }) => {
 };
 
 /** サモナースペルのクールダウンを当てる */
-const summonerCooldown: QuestionGenerator = ({ data, rng }) => {
+export const summonerCooldown: QuestionGenerator = ({ data, rng }) => {
   if (data.summonerSpells.length === 0) return undefined;
   const spell = pick(rng, data.summonerSpells);
   const others = data.summonerSpells
@@ -42,7 +42,7 @@ const summonerCooldown: QuestionGenerator = ({ data, rng }) => {
 };
 
 /** 説明文からサモナースペルを当てる */
-const summonerByDescription: QuestionGenerator = ({ data, rng }) => {
+export const summonerByDescription: QuestionGenerator = ({ data, rng }) => {
   const candidates = data.summonerSpells.filter(
     (s) => s.description.trim() !== "",
   );
@@ -59,9 +59,3 @@ const summonerByDescription: QuestionGenerator = ({ data, rng }) => {
     category: "rune",
   };
 };
-
-export const runeGenerators: QuestionGenerator[] = [
-  runeStyleOf,
-  summonerCooldown,
-  summonerByDescription,
-];

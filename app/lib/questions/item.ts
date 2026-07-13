@@ -6,7 +6,7 @@ import { buildChoices, type QuestionGenerator } from "./index";
 const MIN_PRICE = 900;
 
 /** アイテムの合計価格を当てる */
-const itemPrice: QuestionGenerator = ({ data, rng }) => {
+export const itemPrice: QuestionGenerator = ({ data, rng }) => {
   const candidates = data.items.filter((i) => i.price >= MIN_PRICE);
   if (candidates.length === 0) return undefined;
   const item = pick(rng, candidates);
@@ -23,7 +23,7 @@ const itemPrice: QuestionGenerator = ({ data, rng }) => {
 };
 
 /** アイコン画像からアイテムを当てる */
-const itemImage: QuestionGenerator = ({ data, rng }) => {
+export const itemImage: QuestionGenerator = ({ data, rng }) => {
   const candidates = data.items.filter((i) => i.price >= MIN_PRICE);
   if (candidates.length === 0) return undefined;
   const item = pick(rng, candidates);
@@ -39,7 +39,7 @@ const itemImage: QuestionGenerator = ({ data, rng }) => {
 };
 
 /** 効果テキストからアイテムを当てる */
-const itemEffect: QuestionGenerator = ({ data, rng }) => {
+export const itemEffect: QuestionGenerator = ({ data, rng }) => {
   const candidates = data.items.filter((i) => i.plaintext.trim() !== "");
   if (candidates.length === 0) return undefined;
   const item = pick(rng, candidates);
@@ -54,9 +54,3 @@ const itemEffect: QuestionGenerator = ({ data, rng }) => {
     category: "item",
   };
 };
-
-export const itemGenerators: QuestionGenerator[] = [
-  itemPrice,
-  itemImage,
-  itemEffect,
-];

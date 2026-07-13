@@ -1,14 +1,15 @@
-import { LANE_LABELS, type Lane } from "./data";
+import type { Position } from "./data";
 import type { Rank } from "./rank";
+import { laneLabel } from "./selection";
 
 export function buildShareText(
-  lane: Lane,
+  lanes: readonly Position[],
   correct: number,
   total: number,
   rank: Rank,
 ): string {
-  const laneLabel = lane === "ALL" ? "" : `${LANE_LABELS[lane]}レーン`;
-  return `LoL検定${laneLabel ? `（${laneLabel}）` : ""}で${total}問中${correct}問正解、【${rank.label}】ランクでした！`;
+  const label = laneLabel(lanes);
+  return `LoL検定${label ? `（${label}）` : ""}で${total}問中${correct}問正解、【${rank.label}】ランクでした！`;
 }
 
 export function buildShareUrl(text: string, pageUrl: string): string {

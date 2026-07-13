@@ -3,9 +3,10 @@ import { Link, useNavigate, useSearchParams } from "react-router";
 import { ChoiceButton } from "~/components/ChoiceButton";
 import { ProgressBar } from "~/components/ProgressBar";
 import { QuestionCard } from "~/components/QuestionCard";
-import { isLane, LANE_LABELS, type Lane, loadQuizData } from "~/lib/data";
+import { loadQuizData } from "~/lib/data";
 import { buildQuizSet } from "~/lib/questions";
 import { createRng, randomSeed } from "~/lib/random";
+import { laneLabel, parseSelection } from "~/lib/selection";
 import type { Route } from "./+types/quiz";
 
 export async function clientLoader() {
@@ -16,8 +17,7 @@ export default function Quiz({ loaderData: data }: Route.ComponentProps) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const laneParam = searchParams.get("lane");
-  const lane: Lane = isLane(laneParam) ? laneParam : "ALL";
+  const selection = useMemo(() => parseSelection(searchParams), [searchParams]);
   // Keep the seed stable across re-renders so the question set never shifts
   // mid-quiz; a fresh visit gets a fresh seed.
   const [seed] = useState(() => {
@@ -27,8 +27,8 @@ export default function Quiz({ loaderData: data }: Route.ComponentProps) {
       : randomSeed();
   });
   const questions = useMemo(
-    () => buildQuizSet(data, lane, createRng(seed)),
-    [data, lane, seed],
+    () => buildQuizSet(data, selection, createRng(seed)),
+    [data, selection, seed],
   );
 
   const [index, setIndex] = useState(0);
@@ -38,7 +38,7 @@ export default function Quiz({ loaderData: data }: Route.ComponentProps) {
   if (questions.length === 0) {
     return (
       <main className="mx-auto max-w-xl px-4 py-10 text-center">
-        <p>問題を生成できませんでした。</p>
+        <p>この条件では問題を生成できませんでした。</p>
         <Link to="/" className="mt-4 inline-block text-gold underline">
           トップへ戻る
         </Link>
@@ -49,6 +49,7 @@ export default function Quiz({ loaderData: data }: Route.ComponentProps) {
   const question = questions[index];
   const revealed = selected !== null;
   const isLast = index + 1 >= questions.length;
+  const title = `${laneLabel(selection.lanes) || "総合"}検定`;
 
   const choose = (choiceIndex: number) => {
     if (revealed) return;
@@ -61,7 +62,12 @@ export default function Quiz({ loaderData: data }: Route.ComponentProps) {
   const next = () => {
     if (isLast) {
       navigate("/result", {
-        state: { lane, correct: correctCount, total: questions.length },
+        state: {
+          lanes: selection.lanes,
+          types: selection.types,
+          correct: correctCount,
+          total: questions.length,
+        },
         replace: true,
       });
       return;
@@ -73,9 +79,7 @@ export default function Quiz({ loaderData: data }: Route.ComponentProps) {
   return (
     <main className="mx-auto flex min-h-dvh max-w-xl flex-col gap-5 px-4 py-8">
       <header className="flex items-center justify-between">
-        <h1 className="text-lg font-black text-gold">
-          {LANE_LABELS[lane]}検定
-        </h1>
+        <h1 className="text-lg font-black text-gold">{title}</h1>
         <Link to="/" className="text-xs text-gold-light/60 hover:text-gold">
           中断してトップへ
         </Link>

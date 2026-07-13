@@ -3,7 +3,7 @@ import { pick } from "../random";
 import { buildChoices, type QuestionGenerator } from "./index";
 
 /** スキル名からチャンピオンを当てる */
-const skillOwner: QuestionGenerator = ({ champions, rng }) => {
+export const skillOwner: QuestionGenerator = ({ champions, rng }) => {
   const candidates = champions.filter((c) => c.spells.length > 0);
   if (candidates.length === 0) return undefined;
   const champion = pick(rng, candidates);
@@ -22,7 +22,7 @@ const skillOwner: QuestionGenerator = ({ champions, rng }) => {
 };
 
 /** チャンピオン名から称号を当てる */
-const championTitle: QuestionGenerator = ({ champions, rng }) => {
+export const championTitle: QuestionGenerator = ({ champions, rng }) => {
   const champion = pick(rng, champions);
   const distractors = champions.map((c) => c.title);
   const built = buildChoices(rng, champion.title, distractors);
@@ -35,7 +35,7 @@ const championTitle: QuestionGenerator = ({ champions, rng }) => {
 };
 
 /** 称号からチャンピオンを当てる */
-const titleOwner: QuestionGenerator = ({ champions, rng }) => {
+export const titleOwner: QuestionGenerator = ({ champions, rng }) => {
   const champion = pick(rng, champions);
   const distractors = champions
     .filter((c) => c.title !== champion.title)
@@ -50,7 +50,7 @@ const titleOwner: QuestionGenerator = ({ champions, rng }) => {
 };
 
 /** アイコン画像からチャンピオンを当てる */
-const championImage: QuestionGenerator = ({ data, champions, rng }) => {
+export const championImage: QuestionGenerator = ({ data, champions, rng }) => {
   const champion = pick(rng, champions);
   const distractors = champions.map((c) => c.name);
   const built = buildChoices(rng, champion.name, distractors);
@@ -62,10 +62,3 @@ const championImage: QuestionGenerator = ({ data, champions, rng }) => {
     category: "champion",
   };
 };
-
-export const championGenerators: QuestionGenerator[] = [
-  skillOwner,
-  championTitle,
-  titleOwner,
-  championImage,
-];

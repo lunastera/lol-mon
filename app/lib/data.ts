@@ -8,15 +8,11 @@ export const POSITIONS = [
 
 export type Position = (typeof POSITIONS)[number];
 
-/** "ALL" = 総合（レーン絞り込みなし） */
-export type Lane = Position | "ALL";
-
-export function isLane(value: unknown): value is Lane {
-  return value === "ALL" || POSITIONS.includes(value as Position);
+export function isPosition(value: unknown): value is Position {
+  return POSITIONS.includes(value as Position);
 }
 
-export const LANE_LABELS: Record<Lane, string> = {
-  ALL: "総合",
+export const LANE_LABELS: Record<Position, string> = {
   TOP: "TOP",
   JUNGLE: "JG",
   MIDDLE: "MID",
