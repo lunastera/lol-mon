@@ -55,5 +55,3 @@ npx vite preview
 ## クレジット
 
 LoLもんは Riot Games 非公式のファンコンテンツです。League of Legends および Riot Games は Riot Games, Inc. の商標です。ゲームデータは Riot Data Dragon、レーン情報は Meraki Analytics を利用しています。
-
-プロジェクト構成は [pokutuna/google-cloud-roleup](https://github.com/pokutuna/google-cloud-roleup) を参考にしています。
