@@ -67,12 +67,29 @@ function stripHtml(html: string): string {
     .trim();
 }
 
+/**
+ * Convert an item's in-game description
+ * (<stats>魔力<attention>30</attention>...<passive>追撃</passive>...)
+ * into readable multi-line text: stat lines, then 【パッシブ名】 + effect.
+ */
+function itemDescriptionText(html: string): string {
+  return html
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<(passive|active)>(.*?)<\/\1>/gi, "【$2】")
+    .replace(/<attention>/gi, " ")
+    .replace(/<[^>]+>/g, "")
+    .replace(/[ \t]+/g, " ")
+    .replace(/ ?\n ?/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
 interface DDragonItems {
   data: Record<
     string,
     {
       name: string;
-      plaintext?: string;
+      description: string;
       gold: { total: number; purchasable: boolean };
       maps: Record<string, boolean>;
       tags: string[];
@@ -227,7 +244,7 @@ async function main() {
       id,
       name: i.name,
       nameEn: itemEn.data[id]?.name ?? i.name,
-      plaintext: i.plaintext ?? "",
+      description: itemDescriptionText(i.description),
       price: i.gold.total,
       tags: i.tags,
     }))

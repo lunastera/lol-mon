@@ -62,8 +62,11 @@ export interface Item {
   name: string;
   /** English name for hard-mode search */
   nameEn: string;
-  /** short plain-text effect summary (may be empty) */
-  plaintext: string;
+  /**
+   * In-game description as multi-line plain text: stat lines
+   * (e.g. "魔力 30") followed by 【パッシブ名】 and effect text.
+   */
+  description: string;
   /** total gold cost */
   price: number;
   tags: string[];

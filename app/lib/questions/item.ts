@@ -63,18 +63,31 @@ export const itemImage: QuestionGenerator = ({ data, rng, hard }) => {
   };
 };
 
-/** 効果テキストからアイテムを当てる */
+/** ゲーム内の効果表示（能力値・パッシブ）からアイテムを当てる */
 export const itemEffect: QuestionGenerator = ({ data, rng, hard }) => {
-  const candidates = data.items.filter((i) => i.plaintext.trim() !== "");
+  // Only items whose in-game description is unique have a single right answer
+  // (e.g. jungle companion items share identical text).
+  const descriptionCounts = new Map<string, number>();
+  for (const i of data.items) {
+    descriptionCounts.set(
+      i.description,
+      (descriptionCounts.get(i.description) ?? 0) + 1,
+    );
+  }
+  const candidates = data.items.filter(
+    (i) => i.description !== "" && descriptionCounts.get(i.description) === 1,
+  );
   if (candidates.length === 0) return undefined;
   const item = pick(rng, candidates);
   const distractors = candidates
-    .filter((i) => i.plaintext !== item.plaintext)
+    .filter((i) => i.id !== item.id)
     .map((i) => i.name);
   const built = buildChoices(rng, item.name, distractors);
   if (!built) return undefined;
   return {
-    text: `「${item.plaintext}」— この効果を持つアイテムは？`,
+    text: "この効果を持つアイテムは？",
+    // Passive names can contain the item name — mask it.
+    detail: item.description.replaceAll(item.name, "このアイテム"),
     ...built,
     choiceImageUrls: itemIcons(data, built.choices, data.items),
     ...(hard && { candidates: itemCandidates(data) }),

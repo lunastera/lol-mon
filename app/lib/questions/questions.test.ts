@@ -118,6 +118,34 @@ describe("buildQuizSet", () => {
     expect(ownerSeen).toBeGreaterThan(0);
   });
 
+  it("item effect questions show the exact in-game description of a unique item", () => {
+    const questions = buildQuizSet(
+      data,
+      { lanes: [...DEFAULT_SELECTION.lanes], types: ["item-effect"] },
+      createRng(9),
+    );
+    expect(questions).toHaveLength(20);
+    const descriptionCounts = new Map<string, number>();
+    for (const i of data.items) {
+      descriptionCounts.set(
+        i.description,
+        (descriptionCounts.get(i.description) ?? 0) + 1,
+      );
+    }
+    for (const q of questions) {
+      expect(q.text).toBe("この効果を持つアイテムは？");
+      const answer = data.items.find(
+        (i) => i.name === q.choices[q.answerIndex],
+      );
+      expect(answer, q.choices[q.answerIndex]).toBeDefined();
+      expect(q.detail).toBe(
+        answer?.description.replaceAll(answer.name, "このアイテム"),
+      );
+      // Exactly one item matches the shown description.
+      expect(descriptionCounts.get(answer?.description ?? "")).toBe(1);
+    }
+  });
+
   it("rune effect questions: detail matches the answer rune's description", () => {
     const questions = buildQuizSet(
       data,

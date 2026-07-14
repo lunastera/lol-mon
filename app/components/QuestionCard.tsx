@@ -69,7 +69,7 @@ export function QuestionCard({ question }: { question: Question }) {
         )}
       </p>
       {question.detail && (
-        <p className="mt-3 rounded-lg bg-deep-blue/40 p-3 text-sm leading-relaxed text-gold-light/75">
+        <p className="mt-3 whitespace-pre-line rounded-lg bg-deep-blue/40 p-3 text-left text-sm leading-relaxed text-gold-light/75">
           {question.detail}
         </p>
       )}
