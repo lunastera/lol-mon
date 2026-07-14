@@ -7,6 +7,7 @@ import {
   runeImageUrl,
   summonerSpellImageUrl,
 } from "./data";
+import { RANKS, rankEmblemUrl } from "./rank";
 
 /** Every image the quiz can show, for pre-downloading. */
 export function allImageUrls(data: QuizData): string[] {
@@ -22,5 +23,6 @@ export function allImageUrls(data: QuizData): string[] {
       ...style.runes.map((r) => runeImageUrl(r.icon)),
     ]),
     ...data.summonerSpells.map((s) => summonerSpellImageUrl(data, s)),
+    ...RANKS.map((rank) => rankEmblemUrl(rank)),
   ];
 }

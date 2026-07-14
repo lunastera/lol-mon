@@ -83,6 +83,14 @@ export const RANKS: Rank[] = [
 ];
 
 /**
+ * Official ranked emblem art, mirrored by CommunityDragon (the raw CDN is
+ * provided for tools to hotlink; nothing is redistributed by this repo).
+ */
+export function rankEmblemUrl(rank: Rank): string {
+  return `https://raw.communitydragon.org/latest/plugins/rcp-fe-lol-static-assets/global/default/images/ranked-emblem/emblem-${rank.id.toLowerCase()}.png`;
+}
+
+/**
  * Map a score to a rank. A rank is reached when the correct count is at
  * least ceil(ratio * total); for total=20 the thresholds are
  * 0/3/5/7/10/13/15/17/19/20.
