@@ -10,8 +10,10 @@ import {
   type QuizSelection,
 } from "~/lib/questions";
 import { judgeRank } from "~/lib/rank";
-import { selectionToSearch } from "~/lib/selection";
-import { buildShareText, buildShareUrl } from "~/lib/share";
+import { copyResultImage } from "~/lib/resultImage";
+import { laneLabel, selectionToSearch } from "~/lib/selection";
+// X シェアは画像コピーに置き換えて無効化中（再有効化時にコメントを戻す）
+// import { buildShareText, buildShareUrl } from "~/lib/share";
 
 /** One answered question, recorded by the quiz screen. */
 export interface AnswerRecord {
@@ -163,6 +165,9 @@ function AnswerList({ records }: { records: AnswerRecord[] }) {
 
 export default function Result() {
   const { state } = useLocation();
+  const [copyStatus, setCopyStatus] = useState<
+    "idle" | "working" | "copied" | "downloaded" | "error"
+  >("idle");
   if (!isResultState(state)) return <Navigate to="/" replace />;
 
   const { lanes, types, count, hard, endless, correct, total, records } = state;
@@ -172,10 +177,11 @@ export default function Result() {
     ? judgeRank(Math.min(correct, 20), 20)
     : judgeRank(correct, total);
   const pageUrl = `${window.location.origin}${import.meta.env.BASE_URL}`;
-  const shareUrl = buildShareUrl(
-    buildShareText(lanes, correct, total, rank, hard, endless),
-    pageUrl,
-  );
+  // X シェアは画像コピーに置き換えて無効化中
+  // const shareUrl = buildShareUrl(
+  //   buildShareText(lanes, correct, total, rank, hard, endless),
+  //   pageUrl,
+  // );
   const retrySearch = selectionToSearch({
     lanes: lanes as Position[],
     types: types as QuestionTypeId[],
@@ -200,6 +206,38 @@ export default function Result() {
     [endless ? "エンドレス" : "", hard ? "ハード" : ""]
       .filter(Boolean)
       .join("・") || "通常";
+
+  const copyImage = async () => {
+    if (copyStatus === "working") return;
+    setCopyStatus("working");
+    try {
+      const result = await copyResultImage({
+        rank,
+        scoreText: endless
+          ? `${correct}問連続正解`
+          : `${correct} / ${total} 問正解`,
+        conditionText: [
+          laneLabel(lanes),
+          endless ? "エンドレス" : "",
+          hard ? "ハード" : "",
+        ]
+          .filter(Boolean)
+          .join(" / "),
+        url: pageUrl.replace(/^https?:\/\//, "").replace(/\/$/, ""),
+      });
+      setCopyStatus(result);
+    } catch {
+      setCopyStatus("error");
+    }
+  };
+
+  const copyLabel = {
+    idle: "結果画像をコピー",
+    working: "画像を生成中…",
+    copied: "✓ コピーしました！Discord 等に貼り付けできます",
+    downloaded: "コピー非対応のためダウンロードしました",
+    error: "画像の生成に失敗しました",
+  }[copyStatus];
   const conditions: [string, string][] = [
     ["レーン", laneText],
     ["出題タイプ", typeText],
@@ -238,6 +276,7 @@ export default function Result() {
       {records.length > 0 && <AnswerList records={records} />}
 
       <div className="flex w-full max-w-sm flex-col gap-3">
+        {/* X シェアは画像コピーに置き換えて無効化中
         <a
           href={shareUrl}
           target="_blank"
@@ -246,6 +285,15 @@ export default function Result() {
         >
           𝕏 で結果をシェア
         </a>
+        */}
+        <button
+          type="button"
+          onClick={copyImage}
+          disabled={copyStatus === "working"}
+          className="rounded-lg bg-gold px-4 py-3 text-center font-bold text-hextech-black transition-opacity hover:opacity-85 disabled:opacity-60 cursor-pointer"
+        >
+          {copyLabel}
+        </button>
         <Link
           to={`/quiz${retrySearch}`}
           className="rounded-lg border border-gold px-4 py-3 text-center font-bold text-gold transition-colors hover:bg-gold/10"
