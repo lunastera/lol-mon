@@ -53,6 +53,8 @@ export interface QuestionType {
   id: string;
   label: string;
   category: Category;
+  /** unchecked by default on the home screen (still selectable) */
+  defaultOff?: boolean;
   generators: QuestionGenerator[];
 }
 
@@ -68,6 +70,7 @@ export const QUESTION_TYPES = [
     id: "title",
     label: "称号",
     category: "champion",
+    defaultOff: true,
     generators: [championTitle, titleOwner],
   },
   {
@@ -80,6 +83,7 @@ export const QUESTION_TYPES = [
     id: "item-price",
     label: "アイテム価格",
     category: "item",
+    defaultOff: true,
     generators: [itemPrice],
   },
   {
@@ -128,10 +132,16 @@ export interface QuizSelection {
   types: QuestionTypeId[];
 }
 
+/** "Everything" — the fallback for URLs without lanes/types params. */
 export const DEFAULT_SELECTION: QuizSelection = {
   lanes: [...POSITIONS],
   types: [...QUESTION_TYPE_IDS],
 };
+
+/** Initial home-screen checkboxes: types marked defaultOff start unchecked. */
+export const DEFAULT_CHECKED_TYPES: QuestionTypeId[] = QUESTION_TYPES.filter(
+  (t: QuestionType) => !t.defaultOff,
+).map((t) => t.id as QuestionTypeId);
 
 export const QUESTION_COUNT = 20;
 

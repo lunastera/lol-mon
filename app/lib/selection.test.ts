@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_SELECTION } from "./questions";
+import { DEFAULT_CHECKED_TYPES, DEFAULT_SELECTION } from "./questions";
 import { laneLabel, parseSelection, selectionToSearch } from "./selection";
+
+describe("DEFAULT_CHECKED_TYPES", () => {
+  it("starts with 称号 and アイテム価格 unchecked", () => {
+    expect(DEFAULT_CHECKED_TYPES).not.toContain("title");
+    expect(DEFAULT_CHECKED_TYPES).not.toContain("item-price");
+    expect(DEFAULT_CHECKED_TYPES.length).toBe(
+      DEFAULT_SELECTION.types.length - 2,
+    );
+  });
+});
 
 describe("parseSelection", () => {
   it("falls back to everything when params are missing", () => {

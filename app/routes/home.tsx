@@ -15,6 +15,7 @@ import {
 import { allImageUrls } from "~/lib/images";
 import {
   championPool,
+  DEFAULT_CHECKED_TYPES,
   DEFAULT_SELECTION,
   QUESTION_COUNT,
   QUESTION_TYPES,
@@ -130,7 +131,7 @@ export default function Home({ loaderData: data }: Route.ComponentProps) {
   const navigate = useNavigate();
   const [lanes, setLanes] = useState<Position[]>([...DEFAULT_SELECTION.lanes]);
   const [types, setTypes] = useState<QuestionTypeId[]>([
-    ...DEFAULT_SELECTION.types,
+    ...DEFAULT_CHECKED_TYPES,
   ]);
 
   const toggleLane = (lane: Position, on: boolean) =>
